@@ -104,7 +104,7 @@ class WelfareFormState extends State<WelfareForm> {
                   Content(
                     pathShare: 'content/welfare/',
                     code: widget.code,
-                    url: widget.url,
+                    url: widget.url!,
                     model: widget.model,
                     urlGallery: widget.urlGallery,
                   ),

@@ -227,12 +227,11 @@ class _PolicyIdentityVerificationPageState
                     ),
                   ),
                   new Html(
-                    data: item['description'].toString(),
-                    onLinkTap: (url, context, attributes) {
-                      // ignore: deprecated_member_use
-                      launch(url!);
-                    }
-                  ),
+                      data: item['description'].toString(),
+                      onLinkTap: (url, context, attributes) {
+                        // ignore: deprecated_member_use
+                        launch(url!);
+                      }),
 
                   // new HtmlView(
                   //   data: item['description'].toString(),

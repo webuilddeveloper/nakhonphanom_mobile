@@ -13,14 +13,14 @@ class Content extends StatefulWidget {
   const Content({
     super.key,
     this.code,
-    this.url,
+    required this.url,
     this.model,
     this.urlGallery,
     this.pathShare,
   });
 
   final String? code;
-  final String? url;
+  final String url;
   final dynamic model;
   final String? urlGallery;
   final String? pathShare;
@@ -41,7 +41,7 @@ class ContentState extends State<Content> {
     super.initState();
     sharedApi();
     _futureModel =
-        post(widget.url!, {'skip': 0, 'limit': 1, 'code': widget.code});
+        post(widget.url, {'skip': 0, 'limit': 1, 'code': widget.code});
 
     readGallery();
   }

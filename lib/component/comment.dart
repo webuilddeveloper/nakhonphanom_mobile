@@ -165,14 +165,13 @@ class _Comment extends State<Comment> {
             //   ),
             // ),
             style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-                overlayColor: Theme.of(context).primaryColorDark
-            ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                overlayColor: Theme.of(context).primaryColorDark),
             // splashColor: Colors.transparent,
             // highlightColor: Colors.transparent,
-            
+
             child: const Text(
               'ส่ง',
               style: TextStyle(

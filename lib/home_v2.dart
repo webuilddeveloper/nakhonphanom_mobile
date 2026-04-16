@@ -669,9 +669,9 @@ class _HomePageV2State extends State<HomePageV2> {
   }
 
   _buildProfile() {
-    return Profile(
-      model: _futureProfile!,
-    );
+    // return Profile(
+    //   model: _futureProfile!,
+    // );
   }
 
   _buildRotation() {

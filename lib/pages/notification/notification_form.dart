@@ -70,7 +70,7 @@ class _NotificationForm extends State<NotificationForm> {
               children: [
                 Content(
                   code: widget.code,
-                  url: widget.url,
+                  url: widget.url!,
                   model: widget.model,
                   urlGallery: widget.urlGallery,
                 ),

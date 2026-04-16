@@ -98,7 +98,7 @@ class _NewsForm extends State<NewsForm> {
                   Content(
                     pathShare: 'content/news/',
                     code: widget.code,
-                    url: widget.url,
+                    url: widget.url!,
                     model: widget.model,
                     urlGallery: widget.urlGallery,
                   ),

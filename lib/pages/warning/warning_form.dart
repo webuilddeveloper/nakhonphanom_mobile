@@ -104,7 +104,7 @@ class WarningFormState extends State<WarningForm> {
                   Content(
                     pathShare: 'content/warning/',
                     code: widget.code,
-                    url: widget.url,
+                    url: widget.url!,
                     model: widget.model,
                     urlGallery: widget.urlGallery,
                   ),

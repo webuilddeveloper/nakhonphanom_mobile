@@ -1,4 +1,6 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:marine_mobile/pages/notification/notification_list.dart';
 
@@ -13,6 +15,7 @@ import 'identity_verification.dart';
 
 import 'setting_notification.dart';
 
+// ignore: must_be_immutable
 class UserInformationPage extends StatefulWidget {
   UserInformationPage({super.key, this.changePage});
   Function? changePage;
@@ -58,16 +61,43 @@ class _UserInformationPageState extends State<UserInformationPage> {
     );
   }
 
+  // _read() async {
+  //   print('--------read profile---------');
+  //   var profileCode = await storage.read(key: 'profileCode2');
+
+  //   if (profileCode != '' && profileCode != null) {
+  //     var response = await postDio(profileReadApi, {"code": profileCode});
+
+  //     setState(() {
+  //       _futureProfile = Future.value(response[0]);
+  //     });
+
+  //   }
+  // }
+  int notiCount = 0;
   _read() async {
     print('--------read profile---------');
-    var profileCode = await storage.read(key: 'profileCode2');
+    final profileCode = await storage.read(key: 'profileCode2');
 
-    if (profileCode != '' && profileCode != null) {
-      var response = await postDio(profileReadApi, {"code": profileCode});
+    if (profileCode?.isNotEmpty ?? false) {
+      final response = await postDio(profileReadApi, {"code": profileCode});
+      print('----------response---------\n${response}');
+      if (response.isNotEmpty) {
+        final data = response[0];
+        setState(() {
+          _futureProfile = Future.value(data);
+        });
 
-      setState(() {
-        _futureProfile = Future.value(response[0]);
-      });
+        final noti = await postDio(notificationApi + 'count', {
+          "username": data["username"],
+          "category": data["category"],
+        });
+
+        setState(
+          () => notiCount = noti['total'],
+        );
+        print('--------notiCount--------->> ${notiCount}');
+      }
     }
   }
 
@@ -82,11 +112,10 @@ class _UserInformationPageState extends State<UserInformationPage> {
             alignment: Alignment.topCenter,
             children: [
               SizedBox(
-                // height: MediaQuery.of(context).size.height * 0.6,
                 child: Stack(
                   children: [
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.4,
+                      height: MediaQuery.of(context).size.height * 0.42,
                       child: ClipRRect(
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(30),
@@ -128,25 +157,54 @@ class _UserInformationPageState extends State<UserInformationPage> {
               Positioned(
                 top: statusBarHeight + 10,
                 right: 10,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NotificationList(),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(25),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationList(
+                            title: 'แจ้งเตือน',
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
                       ),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Icon(
-                      Icons.notifications_none,
-                      color: Color(0xFF9e6e19),
-                      size: 30,
+                      child: badges.Badge(
+                        showBadge: notiCount > 0,
+                        position: badges.BadgePosition.topEnd(top: -8, end: -8),
+                        badgeStyle: badges.BadgeStyle(
+                          badgeColor: Colors.red.shade600,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          borderRadius: BorderRadius.circular(12),
+                          elevation: 2,
+                        ),
+                        badgeContent: Text(
+                          notiCount > 99 ? '99+' : notiCount.toString(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.notifications_outlined,
+                          color: Color(0xFF9e6e19),
+                          size: 26,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -271,9 +329,9 @@ class _UserInformationPageState extends State<UserInformationPage> {
                 ),
               ),
               Container(
-                height: 120,
-                width: 120,
-                margin: EdgeInsets.only(top: 70),
+                height: 110,
+                width: 110,
+                margin: EdgeInsets.only(top: 50),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -292,7 +350,7 @@ class _UserInformationPageState extends State<UserInformationPage> {
                       : Container(
                           color: Colors.black12,
                           child: Image.asset(
-                            'assets/profile.png',
+                            'assets/icons/profile_icon.png',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -318,7 +376,7 @@ class _UserInformationPageState extends State<UserInformationPage> {
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Sarabun',
-                              fontSize: 25.0,
+                              fontSize: 24.0,
                               color: Color(0xFF9e6e19)),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,

@@ -266,7 +266,9 @@ class _VehicleInspectioPageState extends State<VehicleInspectio> {
   dataImage(urlImageProvider, index) {
     for (var item in urlImageProvider) {
       dataPro.add(
-        item['imageUrl'] != null ? NetworkImage(item['imageUrl']) : NetworkImage(""),
+        item['imageUrl'] != null
+            ? NetworkImage(item['imageUrl'])
+            : NetworkImage(""),
       );
     }
     return ImageViewer(

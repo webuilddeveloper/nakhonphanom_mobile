@@ -38,7 +38,8 @@ const versionNumber = 1;
 
 const serverPrefix = 'https://khubdeedlt.we-builds.com/';
 const server = '$serverPrefix/khubdeedlt-api/';
-const serverNpm = 'http://gateway.we-builds.com/nakhonphanom-api';
+const serverNpm = 'https://gateway.we-builds.com/nakhonphanom-api';
+
 const serverUpload = '$serverPrefix/khubdeedlt-document/upload';
 const serverMW = 'http://122.155.223.63/td-khub-dee-middleware-api/';
 
@@ -69,7 +70,8 @@ const bannerGalleryApi = 'm/banner/gallery/read';
 const privilegeApi = serverNpm + "/privilege/";
 const menuApi = server + "m/menu/";
 const aboutUsApi = server + "m/aboutus/";
-const notificationApi = server + 'm/notification/';
+const notificationApi = serverNpm + '/m/notification/';
+
 const welfareApi = server + 'm/welfare/';
 const welfareGalleryApi = server + 'm/welfare/gallery/read';
 const eventCalendarApi = serverNpm + '/eventCalendar/';
@@ -217,6 +219,9 @@ Future<dynamic> post(String url, dynamic criteria) async {
 }
 
 Future<dynamic> postAny(String url, dynamic criteria) async {
+  print('-----------postAny------------');
+  print('url: $url');
+  print('criteria: $criteria');
   var body = json.encode({
     "permission": "all",
     "skip": criteria['skip'] != null ? criteria['skip'] : 0,
@@ -238,6 +243,9 @@ Future<dynamic> postAny(String url, dynamic criteria) async {
     "Accept": "application/json",
     "Content-Type": "application/json"
   });
+  print(' -----------postAny response------------');
+  print('statusCode: ${response.statusCode}');
+  print('body: ${response.body}');
 
   var data = json.decode(response.body);
 
@@ -291,6 +299,7 @@ Future<dynamic> postObjectData(String url, dynamic criteria) async {
   print('-----------postObjectData------------');
   print('url: $url');
   print('criteria: $criteria');
+  print('url: ${serverNpm + url}');
   var body = json.encode(criteria);
 
   var response = await http.post(Uri.parse(serverNpm + url),
@@ -460,6 +469,9 @@ logout(BuildContext context) async {
 }
 
 Future<dynamic> postDio(String url, dynamic criteria) async {
+  print('-------------postDio---------------');
+  print('-----url-----' + url);
+  print('-----criteria-----' + criteria.toString());
   final storage = new FlutterSecureStorage();
   final profileCode = await storage.read(key: 'profileCode2');
   final idcard = await storage.read(key: 'idcard');
@@ -479,13 +491,11 @@ Future<dynamic> postDio(String url, dynamic criteria) async {
     criteria = {'username': username, ...criteria};
   }
 
-  // สร้าง Dio instance พร้อม options
   Dio dio = new Dio(BaseOptions(
     connectTimeout: Duration(seconds: 60),
     receiveTimeout: Duration(seconds: 60),
   ));
 
-  // แก้ปัญหา SSL Certificate
   (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
     client.badCertificateCallback = (cert, host, port) => true;
     return client;
@@ -499,47 +509,6 @@ Future<dynamic> postDio(String url, dynamic criteria) async {
     throw e;
   }
 }
-// Future<dynamic> postDio(String url, dynamic criteria) async {
-//   print('-----postDio-----');
-
-//   print('-----url-----' + url);
-//   print('-----criteria-----' + criteria.toString());
-//   final storage = new FlutterSecureStorage();
-//   final profileCode = await storage.read(key: 'profileCode2');
-//   final idcard = await storage.read(key: 'idcard');
-//   final username = await storage.read(key: 'username');
-
-//   if (profileCode != '' && profileCode != null) {
-//     criteria = {'profileCode': profileCode, ...criteria};
-//   }
-
-//   if (criteria['card_id'] == '' ||
-//       criteria['card_id'] == null) if (idcard != '' && idcard != null) {
-//     criteria = {'card_id': idcard, ...criteria};
-//   }
-
-//   if (username != '' && username != null) {
-//     criteria = {'username': username, ...criteria};
-//   }
-
-//   Dio dio = new Dio(BaseOptions(
-//     connectTimeout: Duration(seconds: 60),
-//     receiveTimeout: Duration(seconds: 60),
-//   ));
-
-//   (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
-//     client.badCertificateCallback = (cert, host, port) => true;
-//     return client;
-//   };
-
-//   try {
-//     var response = await dio.post(url, data: criteria);
-//     return Future.value(response.data['objectData']);
-//   } catch (e) {
-//     print('Error in postDio: $e');
-//     throw e;
-//   }
-// }
 
 Future<dynamic> postAnyDio(String url, dynamic criteria) async {
   final storage = new FlutterSecureStorage();

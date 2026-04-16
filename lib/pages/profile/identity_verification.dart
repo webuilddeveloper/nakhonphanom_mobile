@@ -297,79 +297,80 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     return "$y$m$d";
   }
 
-  Future<dynamic> getUser() async {
-    var profileCode = await storage.read(key: 'profileCode2');
+  Future<void> getUser() async {
+    try {
+      var profileCode = await storage.read(key: 'profileCode2');
 
-    if (profileCode != '') {
-      print('-----$profileCode-----');
-      final result =
-          await postObjectData("m/Register/read", {'code': profileCode});
-      print('-----${result.toString()}-----');
-      if (result['status'] == 'S') {
-        // await storage.write(
-        //   key: 'dataUserLoginOPEC',
-        //   value: jsonEncode(result['objectData'][0]),
-        // );
+      if (profileCode == null || profileCode.isEmpty) return;
 
-        if (result['objectData'][0]['birthDay'] != '') {
-          if (isValidDate(result['objectData'][0]['birthDay'])) {
-            var date = result['objectData'][0]['birthDay'];
-            var year = date.substring(0, 4);
-            var month = date.substring(4, 6);
-            var day = date.substring(6, 8);
-            DateTime todayDate = DateTime.parse(year + '-' + month + '-' + day);
+      // final result = await postDio('$serverNpm/m/register/read', {
+      //   "code": profileCode,
+      // });
+      final result = await postDio(profileReadApi, {"code": profileCode});
+
+      print('========getUser====result====>>>>> $result');
+
+      if (result is List && result.isNotEmpty) {
+        final userData = result[0];
+
+        await storage.write(
+          key: 'dataUserLoginOPEC',
+          value: jsonEncode(userData),
+        );
+
+        if (userData['birthDay'] != null &&
+            userData['birthDay'].toString().isNotEmpty) {
+          if (isValidDate(userData['birthDay'])) {
+            final dateStr = userData['birthDay'];
+            final year = dateStr.substring(0, 4);
+            final month = dateStr.substring(4, 6);
+            final day = dateStr.substring(6, 8);
+            final birthDate = DateTime.parse('$year-$month-$day');
+
+            txtDate.text = DateFormat("dd-MM-yyyy").format(birthDate);
             setState(() {
-              _selectedYear = todayDate.year;
-              _selectedMonth = todayDate.month;
-              _selectedDay = todayDate.day;
-              txtDate.text = DateFormat("dd-MM-yyyy").format(todayDate);
+              _selectedYear = birthDate.year;
+              _selectedMonth = birthDate.month;
+              _selectedDay = birthDate.day;
             });
           }
         }
 
         setState(() {
-          _username = result['objectData'][0]['username'];
-          dataCountUnit = result['objectData'][0]['countUnit'] != null
-              ? json.decode(result['objectData'][0]['countUnit'])
-              : [];
-          _imageUrl = result['objectData'][0]['imageUrl'];
-          txtFirstName.text = result['objectData'][0]['firstName'];
-          txtLastName.text = result['objectData'][0]['lastName'];
-          txtEmail.text = result['objectData'][0]['email'];
-          txtPhone.text = result['objectData'][0]['phone'];
-          _selectedPrefixName = result['objectData'][0]['prefixName'];
-          txtPhone.text = result['objectData'][0]['phone'];
-          txtUsername.text = result['objectData'][0]['username'];
-          txtIdCard.text = result['objectData'][0]['idcard'];
-          txtLineID.text = result['objectData'][0]['lineID'];
-          txtOfficerCode.text = result['objectData'][0]['officerCode'];
-          txtAddress.text = result['objectData'][0]['address'];
-          txtMoo.text = result['objectData'][0]['moo'];
-          txtSoi.text = result['objectData'][0]['soi'];
-          txtRoad.text = result['objectData'][0]['road'];
-          txtPrefixName.text = result['objectData'][0]['prefixName'];
+          _imageUrl = userData['imageUrl'] ?? '';
+          txtFirstName.text = userData['firstName'] ?? '';
+          txtLastName.text = userData['lastName'] ?? '';
+          txtEmail.text = userData['email'] ?? '';
+          txtPhone.text = userData['phone'] ?? '';
+          txtUsername.text = userData['username'] ?? '';
+          txtIdCard.text = userData['idcard'] ?? '';
+          txtLineID.text = userData['lineID'] ?? '';
+          txtOfficerCode.text = userData['officerCode'] ?? '';
+          txtAddress.text = userData['address'] ?? '';
+          txtMoo.text = userData['moo'] ?? '';
+          txtSoi.text = userData['soi'] ?? '';
+          txtRoad.text = userData['road'] ?? '';
+          txtPrefixName.text = userData['prefixName'] ?? '';
 
-          _selectedProvince = result['objectData'][0]['provinceCode'];
-          _selectedDistrict = result['objectData'][0]['amphoeCode'];
-          _selectedSubDistrict = result['objectData'][0]['tambonCode'];
-          _selectedPostalCode = result['objectData'][0]['postnoCode'];
-          _selectedSex = result['objectData'][0]['sex'];
+          _selectedProvince = userData['provinceCode'] ?? '';
+          _selectedDistrict = userData['amphoeCode'] ?? '';
+          _selectedSubDistrict = userData['tambonCode'] ?? '';
+          _selectedPostalCode = userData['postnoCode'] ?? '';
+          _selectedSex = userData['sex'] ?? '';
         });
-      }
-      if (_selectedProvince != '') {
-        getPolicy();
-        getProvince();
-        getDistrict();
-        getSubDistrict();
-        setState(() {
-          futureModel = getPostalCode();
-        });
+
+        // โหลดข้อมูลพื้นที่
+        await getProvince();
+        if (_selectedProvince!.isNotEmpty) {
+          await getDistrict();
+          await getSubDistrict();
+          await getPostalCode();
+        }
       } else {
-        getPolicy();
-        setState(() {
-          futureModel = getProvince();
-        });
+        print("Result is not a valid list or is empty");
       }
+    } catch (e) {
+      print('Error in getUser: $e');
     }
   }
 

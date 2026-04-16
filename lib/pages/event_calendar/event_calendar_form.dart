@@ -104,7 +104,7 @@ class _EventCalendarForm extends State<EventCalendarForm> {
                   Content(
                     pathShare: 'content/eventCalendar/',
                     code: widget.code,
-                    url: widget.url,
+                    url: widget.url!,
                     model: widget.model,
                     urlGallery: widget.urlGallery,
                   ),
