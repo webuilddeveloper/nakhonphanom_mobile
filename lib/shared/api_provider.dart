@@ -18,7 +18,7 @@ import 'line.dart';
 
 const appName = 'Khub Dee DLT';
 const versionName = '0.0.1';
-const versionNumber = 1;
+const versionNumber = 6;
 
 // flutter build apk --build-name=0.0.1 --build-number=1
 
